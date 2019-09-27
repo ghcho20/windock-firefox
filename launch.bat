@@ -1,5 +1,9 @@
-ipconfig | sed -n -e '/IPv4 Address/s/.\+: //p' | head -n 1 > display.tgt
-set /p DISPLAY=<display.tgt
+@echo off
+:: usage:
+::   run.bat [alice ip] [bob ip]
+
+for /f "usebackq" %%a in (`hostname`) do set HOST=%%a
+for /f "tokens=2 skip=4 usebackq" %%a in (`nslookup %HOST%`) do set DISPLAY=%%a:0.0
 
 if [%SHELL%] == [/bin/bash] (
 	set DOCKER=winpty docker
@@ -7,4 +11,4 @@ if [%SHELL%] == [/bin/bash] (
 	set DOCKER=docker
 )
 
-%DOCKER% run -it --rm -e DISPLAY=%DISPLAY%:0.0 ff:0
+%DOCKER% run -it --rm -e DISPLAY=%DISPLAY% ff:0
